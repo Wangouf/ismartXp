@@ -4,6 +4,7 @@ package com.example.myapplication;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -29,8 +30,13 @@ public class Hook implements IXposedHookLoadPackage {
                     ctx = context;
                     Intent intent = new Intent();
                     intent.setClassName("com.example.myapplication","com.example.myapplication.MyService");
-                    ctx.startService(intent);
-                    new Handler(ctx,getUtMethod,gbCallBack,getUniqueDeviceId,dID);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        ctx.startForegroundService(intent);
+                        new Handler(ctx,getUtMethod,gbCallBack,getUniqueDeviceId,dID);
+                    } else {
+                        ctx.startService(intent);
+                        new Handler(ctx,getUtMethod,gbCallBack,getUniqueDeviceId,dID);
+                    }
                 } else {
                     XposedBridge.log("get Context Failllllllll");
                 }

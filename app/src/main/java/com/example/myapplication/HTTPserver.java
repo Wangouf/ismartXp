@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
 import fi.iki.elonen.NanoHTTPD;
 
 import java.io.IOException;
@@ -82,24 +83,27 @@ public class HTTPserver extends NanoHTTPD{
         String msg="Error";
         if (session.getMethod() == Method.GET) {
             Map<String, String> parms = session.getParms();
-            if (parms.get("method")=="getUt") {
-                if (parms.get("str") != null && parms.get("i") != null) {
+            if (parms.containsKey("method")) {
+                if (parms.get("method").equals("getUt")) {
+                    if (parms.get("str") != null && parms.get("i") != null) {
+                        try {
+                            msg = getUt(parms.get("str").toString(),22);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                if (parms.get("method").equals("getUniqueDeviceId")) {
                     try {
-                        msg = getUt(parms.get("str").toString(),Integer.valueOf(parms.get("i").toString()).intValue());
-                    } catch (Exception e) {
+                        msg = getdID();
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-            }
-            if (parms.get("method")=="getUniqueDeviceId") {
-                try {
-                    msg = getdID();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
             }
         }
-
         return newFixedLengthResponse(msg);
 
 
